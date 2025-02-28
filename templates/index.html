@@ -98,7 +98,7 @@
               <!-- Uploaded Image -->
               <div class="col-md-6">
                 <div class="card h-100">
-                  <div class="card-header">Uploaded Image</div>
+                  <div class="card-header bg-success text-white">Uploaded Image</div>
                   <div class="card-body">
                     <img
                       src="{{ url_for('static', filename=image_path) }}"
@@ -110,7 +110,7 @@
               <!-- Reference Image -->
               <div class="col-md-6">
                 <div class="card h-100">
-                  <div class="card-header">Reference Image</div>
+                  <div class="card-header bg-success text-white">Reference Image</div>
                   <div class="card-body">
                     <img
                       src="{{ reference_image }}"
@@ -124,7 +124,7 @@
             <!-- Disease Information -->
             <div class="mt-4">
               <div class="card">
-                <div class="card-header">
+                <div class="card-header bg-success text-white">
                   <h4 class="mb-0">{{ disease }}</h4>
                 </div>
                 <div class="card-body">
@@ -135,6 +135,119 @@
                 </div>
               </div>
             </div>
+
+            <!-- Recommended Products -->
+            <style>
+              /* Card Grid Layout */
+              .product-card {
+                margin-bottom: 1.5rem;
+              }
+
+              /* Card Design */
+              .hover-card {
+                transition: all 0.3s ease;
+                height: 100%;
+                border: none;
+                background: #fff;
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+              }
+
+              .hover-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+              }
+
+              /* Image Container */
+              .card-img-wrapper {
+                height: 240px;
+                overflow: hidden;
+                border-radius: 12px 12px 0 0;
+                background: #f8f9fa;
+                position: relative;
+              }
+
+              .card-img-wrapper img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+                padding: 1rem;
+                transition: transform 0.3s ease;
+              }
+
+              .hover-card:hover .card-img-wrapper img {
+                transform: scale(1.05);
+              }
+
+              /* Card Body */
+              .card-body {
+                padding: 1.5rem;
+                display: flex;
+                flex-direction: column;
+                gap: 0.75rem;
+              }
+
+              .card-title {
+                font-size: 1rem;
+                line-height: 1.4;
+                margin: 0;
+                height: 2.8em;
+                overflow: hidden;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+              }
+
+              .badge {
+                font-weight: 500;
+                padding: 0.5em 1em;
+                font-size: 0.75rem;
+              }
+
+              /* Buy Button */
+              .btn-outline-success {
+                padding: 0.75rem;
+                font-weight: 500;
+                border-width: 2px;
+                transition: all 0.2s ease;
+              }
+            </style>
+            <div class="mt-4">
+              <div class="card border-0 shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">Recommended Product</h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="product-card">
+                        <div class="card hover-card">
+                            <div class="card-img-wrapper">
+                                <img src="{{ recommended_product.supplement_image }}"
+                                     class="card-img-top"
+                                     alt="{{ recommended_product.supplement_name }}"
+                                     onerror="this.src='static/images/placeholder.jpg'; this.onerror=null;"
+                                />
+                            </div>
+                            <div class="card-body">
+                                <span class="badge bg-success mb-2">{{ disease }}</span>
+                                <h5 class="card-title">{{ recommended_product.supplement_name }}</h5>
+                                <a href="{{ recommended_product.buy_link }}"
+                                   target="_blank"
+                                   class="btn btn-outline-success w-100">
+                                    <i class="fas fa-shopping-cart me-2"></i>Buy Now
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <a href="/marketplace" class="btn btn-success btn-lg">
+                            <i class="fas fa-store me-2"></i>View All Products
+                        </a>
+                    </div>
+                </div>
+              </div>
+            </div>
+
           </div>
           {% endif %}
         </div>

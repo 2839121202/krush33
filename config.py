@@ -2,6 +2,7 @@ import os
 
 # File paths
 DISEASE_INFO_PATH_PARTIAL = "./files/disease_info"
+MARKETPLACE_INFO_PATH = "./files/supplement_info_en.csv"
 
 MODEL_WEIGHTS_PATH = "./files/trained_model.pt"
 UPLOAD_FOLDER = "static/uploads/"

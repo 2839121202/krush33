@@ -1,0 +1,187 @@
+{% extends "base.html" %} {% block title %}Agricultural Marketplace{% endblock
+%} {% block content %}
+<div class="container py-5">
+  <!-- Disclaimer Banner -->
+  <div class="alert alert-info mb-4" role="alert">
+    <i class="fas fa-info-circle me-2"></i>
+    <strong>Pro Tip:</strong> Visit our
+    <a href="/" class="alert-link">Disease Detection</a> page first to get
+    personalized product recommendations for your crops.
+  </div>
+
+  <!-- Hero Section -->
+  <div class="text-center mb-5">
+    <h1 class="display-4 mb-3">Agricultural Marketplace</h1>
+    <p class="lead text-muted">Find the right products for your crops</p>
+    <div class="mt-4">
+      <a href="/" class="btn btn-success btn-lg">
+        <i class="fas fa-camera me-2"></i>Detect Plant Disease First
+      </a>
+    </div>
+  </div>
+
+  <!-- Search & Filter -->
+  <div class="row mb-4">
+    <div class="col-md-6 mx-auto">
+      <div class="input-group">
+        <span class="input-group-text bg-success text-white">
+          <i class="fas fa-search"></i>
+        </span>
+        <input
+          type="text"
+          id="searchInput"
+          class="form-control"
+          placeholder="Search products..."
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- Products Grid -->
+  <div class="row row-cols-1 row-cols-md-3 g-4" id="productsContainer">
+    {% for product in products %}
+    <div class="col product-card">
+      <div class="card h-100 shadow-sm hover-card">
+        <div class="card-img-wrapper">
+          <img
+            src="{{ product['supplement_image'] }}"
+            class="card-img-top"
+            alt="{{ product['supplement_name'] }}"
+          />
+        </div>
+        <div class="card-body">
+          <span class="badge bg-success mb-2"
+            >{{ product['disease_name'] }}</span
+          >
+          <h5 class="card-title">{{ product['supplement_name'] }}</h5>
+          <a
+            href="{{ product['buy_link'] }}"
+            target="_blank"
+            class="btn btn-outline-success w-100"
+          >
+            <i class="fas fa-shopping-cart me-2"></i>Buy Now
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<style>
+  /* Card Grid Layout */
+  .product-card {
+    margin-bottom: 1.5rem;
+  }
+
+  /* Card Design */
+  .hover-card {
+    transition: all 0.3s ease;
+    height: 100%;
+    border: none;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Image Container */
+  .card-img-wrapper {
+    height: 240px;
+    overflow: hidden;
+    border-radius: 12px 12px 0 0;
+    background: #f8f9fa;
+    position: relative;
+  }
+
+  .card-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 1rem;
+    transition: transform 0.3s ease;
+  }
+
+  .hover-card:hover .card-img-wrapper img {
+    transform: scale(1.05);
+  }
+
+  /* Card Body */
+  .card-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .card-title {
+    font-size: 1rem;
+    line-height: 1.4;
+    margin: 0;
+    height: 2.8em;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .badge {
+    font-weight: 500;
+    padding: 0.5em 1em;
+    font-size: 0.75rem;
+  }
+
+  /* Buy Button */
+  .btn-outline-success {
+    padding: 0.75rem;
+    font-weight: 500;
+    border-width: 2px;
+    transition: all 0.2s ease;
+  }
+
+  /* Responsive Grid */
+  @media (max-width: 767px) {
+    .row-cols-1 {
+      margin: 0 0.5rem;
+    }
+    .card-img-wrapper {
+      height: 200px;
+    }
+  }
+
+  @media (min-width: 768px) and (max-width: 991px) {
+    .row-cols-md-3 > * {
+      flex: 0 0 50%;
+      max-width: 50%;
+    }
+  }
+</style>
+
+<script>
+  document
+    .getElementById("searchInput")
+    .addEventListener("keyup", function (e) {
+      const searchText = e.target.value.toLowerCase();
+      const products = document.getElementsByClassName("product-card");
+
+      Array.from(products).forEach((product) => {
+        const title = product
+          .querySelector(".card-title")
+          .textContent.toLowerCase();
+        const disease = product
+          .querySelector(".badge")
+          .textContent.toLowerCase();
+
+        if (title.includes(searchText) || disease.includes(searchText)) {
+          product.style.display = "";
+        } else {
+          product.style.display = "none";
+        }
+      });
+    });
+</script>
+{% endblock %}

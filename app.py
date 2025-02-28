@@ -57,6 +57,11 @@ for lang_code, lang_data in LANGUAGES.items():
     except Exception as e:
         print(f"Error loading {lang_code}: {str(e)}")
 
+## ============== Marketplace Info ============== ##
+# Load the marketplace info
+disease_info = pd.read_csv(MARKETPLACE_INFO_PATH, encoding=CSV_ENCODING)
+products = disease_info.to_dict("records")
+
 ## ============== Flask App ============== ##
 # Flask app
 app = Flask(__name__)
@@ -116,6 +121,7 @@ def index():
                     description=description,
                     prevention=prevention,
                     reference_image=reference_image,
+                    recommended_product=products[index],
                 )
             except Exception as e:
                 return render_template(
@@ -129,6 +135,11 @@ def index():
         )
 
     return render_template("index.html", languages=LANGUAGES)
+
+
+@app.route("/marketplace")
+def marketplace():
+    return render_template("marketplace.html", products=products)
 
 
 @app.route("/weather")
