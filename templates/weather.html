@@ -1,11 +1,11 @@
-{% extends "base.html" %} {% block title %}Weather Forecast{% endblock %} {%
-block content %}
+{% extends "base.html" %} {% block title %}{{ t('weather.title') }}{% endblock
+%} {% block content %}
 <div class="container py-5">
   <div class="row justify-content-center">
     <div class="col-md-10">
       <div class="card shadow">
         <div class="card-body">
-          <h2 class="text-center mb-4">Weather Forecast</h2>
+          <h2 class="text-center mb-4">{{ t('weather.title') }}</h2>
 
           <!-- Location Form -->
           <div class="row mb-4">
@@ -18,20 +18,22 @@ block content %}
                   type="text"
                   id="location-input"
                   class="form-control"
-                  placeholder="Enter city name (e.g., Chennai, IN)"
+                  placeholder="{{ t('weather.location.search') }}"
                 />
                 <button
                   class="btn btn-success"
                   type="button"
                   id="search-location"
                 >
-                  <i class="fas fa-search"></i> Search
+                  <i class="fas fa-search"></i> {{ t('weather.location.search')
+                  }}
                 </button>
               </div>
             </div>
             <div class="col-md-4">
               <button id="current-location" class="btn btn-success w-100">
-                <i class="fas fa-map-marker-alt"></i> Use Current Location
+                <i class="fas fa-map-marker-alt"></i> {{
+                t('weather.location.current') }}
               </button>
             </div>
           </div>
@@ -43,21 +45,21 @@ block content %}
               class="btn btn-outline-success active"
               data-days="7"
             >
-              7 Days
+              {{ t('weather.forecast.days_7') }}
             </button>
             <button
               type="button"
               class="btn btn-outline-success"
               data-days="14"
             >
-              14 Days
+              {{ t('weather.forecast.days_14') }}
             </button>
           </div>
 
           <!-- Loading Spinner -->
           <div id="loading" class="text-center my-5" style="display: none">
             <div class="spinner-border text-success" role="status">
-              <span class="visually-hidden">Loading...</span>
+              <span class="visually-hidden">{{ t('common.loading') }}</span>
             </div>
           </div>
 
@@ -117,7 +119,9 @@ block content %}
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="card-title mb-0 ${
                           index === 0 ? "text-success" : ""
-                        }">${index === 0 ? "Today" : formattedDate}</h5>
+                        }">${
+        index === 0 ? "{{ t('weather.forecast.today') }}" : formattedDate
+      }</h5>
                         <span class="badge ${getWeatherBadgeClass(
                           day.weathercode
                         )}">${getWeatherDescription(day.weathercode)}</span>
@@ -143,13 +147,13 @@ block content %}
                             <i class="fas fa-cloud-rain text-info"></i>
                             <span class="ms-2">${Math.round(
                               day.precipitation_prob
-                            )}% chance of rain</span>
+                            )}% {{ t('weather.details.rain') }}</span>
                         </div>
                         <div class="detail-item">
                             <i class="fas fa-wind text-secondary"></i>
                             <span class="ms-2">${Math.round(
                               day.windspeed
-                            )} km/h wind</span>
+                            )} km/h {{ t('weather.details.wind') }}</span>
                         </div>
                     </div>
                 </div>

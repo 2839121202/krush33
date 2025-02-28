@@ -1,0 +1,86 @@
+{
+  "nav": {
+    "home": "Home",
+    "weather": "Weather",
+    "marketplace": "Marketplace",
+    "about": "About"
+  },
+  "home": {
+    "title": "Plant Disease Detection",
+    "language_select": "Select Language",
+    "upload": {
+      "title": "Upload Image",
+      "drag_text": "Drag & drop image here or",
+      "select_btn": "Select Image",
+      "camera_btn": "Use Camera",
+      "capture_btn": "Capture",
+      "switch_camera": "Switch Camera",
+      "supported_formats": "Supported formats: JPG, JPEG, PNG"
+    },
+    "det_dis": "Detect Disease",
+    "det_res": "Detection Results",
+    "up": "Uploaded Image",
+    "ref": "Reference Image",
+    "results": {
+      "disease": "Disease",
+      "description": "Description",
+      "prevention": "Prevention Steps",
+      "recommended": "Recommended Products",
+      "buy": "Buy Now",
+      "view_all": "View All Products"
+    }
+  },
+  "weather": {
+    "title": "Weather Forecast",
+    "location": {
+      "search": "Search location",
+      "current": "Use current location"
+    },
+    "forecast": {
+      "today": "Today",
+      "days_7": "7 Days",
+      "days_14": "14 Days"
+    },
+    "details": {
+      "temp": "Temperature",
+      "humidity": "Humidity",
+      "wind": "Wind Speed",
+      "rain": "Chance of Rain"
+    }
+  },
+  "marketplace": {
+    "title": "Agricultural Marketplace",
+    "subtitle": "Find the right products for your crops",
+    "search": "Search products...",
+    "tip": {
+      "title": "Pro Tip",
+      "text": "Visit our",
+      "link": "Disease Detection",
+      "next": "page to get recommendations based on your crop disease"
+    },
+    "detect_first": "Detect Plant Disease First",
+    "filters": {
+      "all": "All Products",
+      "fertilizers": "Fertilizers",
+      "pesticides": "Pesticides",
+      "tools": "Tools"
+    },
+    "product": {
+      "price": "Price",
+      "buy": "Buy Now",
+      "view_details": "View Details"
+    },
+    "empty": {
+      "title": "No Products Found",
+      "text": "Try adjusting your search criteria"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "success": "Success",
+    "cancel": "Cancel",
+    "close": "Close"
+  }
+}

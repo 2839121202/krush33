@@ -1,5 +1,13 @@
 import os
-from flask import Flask, redirect, render_template, request, send_from_directory
+from flask import (
+    Flask,
+    redirect,
+    render_template,
+    request,
+    send_from_directory,
+    session,
+    jsonify,
+)
 from PIL import Image
 import torchvision.transforms.functional as TF
 import CNN
@@ -9,7 +17,7 @@ import pandas as pd
 from werkzeug.utils import secure_filename
 
 from weather import geocode_location, get_weather_data, get_weather_icon
-from flask import jsonify
+from translation import get_translation
 
 from config import *
 
@@ -66,6 +74,18 @@ products = disease_info.to_dict("records")
 # Flask app
 app = Flask(__name__)
 
+app.secret_key = os.urandom(24)
+app.jinja_env.globals.update(t=get_translation)
+
+
+@app.before_request
+def before_request():
+    lang = request.args.get("lang")
+    if lang in LANGUAGES:
+        session["lang"] = lang
+    elif "lang" not in session:
+        session["lang"] = "en"
+
 
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024  # 16MB max file size
@@ -88,13 +108,19 @@ def index():
     if request.method == "POST":
         if "image" not in request.files:
             return render_template(
-                "index.html", error="No file uploaded", languages=LANGUAGES
+                "index.html",
+                error="No file uploaded",
+                languages=LANGUAGES,
+                selected_lang=session.get("lang", "en"),
             )
 
         file = request.files["image"]
         if file.filename == "":
             return render_template(
-                "index.html", error="No file selected", languages=LANGUAGES
+                "index.html",
+                error="No file selected",
+                languages=LANGUAGES,
+                selected_lang=session.get("lang", "en"),
             )
 
         if file and allowed_file(file.filename):
@@ -104,7 +130,7 @@ def index():
 
             try:
                 index = prediction(filepath)
-                lang = request.form.get("language", "en")
+                lang = session.get("lang", "en")
                 disease_info = disease_info_dict.get(lang, disease_info_dict["en"])
 
                 disease = disease_info.loc[index, "disease_name"]
@@ -127,24 +153,39 @@ def index():
                 return render_template(
                     "index.html",
                     languages=LANGUAGES,
+                    selected_lang=session.get("lang", "en"),
                     error=f"Error processing image: {str(e)}",
                 )
 
         return render_template(
-            "index.html", languages=LANGUAGES, error="Invalid file type"
+            "index.html",
+            languages=LANGUAGES,
+            selected_lang=session.get("lang", "en"),
+            error="Invalid file type",
         )
 
-    return render_template("index.html", languages=LANGUAGES)
+    return render_template(
+        "index.html",
+        languages=LANGUAGES,
+        selected_lang=session.get("lang", "en"),
+    )
 
 
 @app.route("/marketplace")
 def marketplace():
-    return render_template("marketplace.html", products=products)
+    return render_template(
+        "marketplace.html",
+        products=products,
+        languages=LANGUAGES,
+    )
 
 
 @app.route("/weather")
 def weather():
-    return render_template("weather.html")
+    return render_template(
+        "weather.html",
+        languages=LANGUAGES,
+    )
 
 
 @app.route("/api/weather")

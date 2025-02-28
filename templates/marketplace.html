@@ -1,21 +1,22 @@
-{% extends "base.html" %} {% block title %}Agricultural Marketplace{% endblock
-%} {% block content %}
+{% extends "base.html" %} {% block title %}{{ t('marketplace.title') }}{%
+endblock %} {% block content %}
 <div class="container py-5">
   <!-- Disclaimer Banner -->
   <div class="alert alert-info mb-4" role="alert">
     <i class="fas fa-info-circle me-2"></i>
-    <strong>Pro Tip:</strong> Visit our
-    <a href="/" class="alert-link">Disease Detection</a> page first to get
-    personalized product recommendations for your crops.
+    <strong>{{ t('marketplace.tip.title') }}:</strong> {{
+    t('marketplace.tip.text') }}
+    <a href="/" class="alert-link">{{ t('marketplace.tip.link') }}</a>
+    {{ t('marketplace.tip.next') }}
   </div>
 
   <!-- Hero Section -->
   <div class="text-center mb-5">
-    <h1 class="display-4 mb-3">Agricultural Marketplace</h1>
-    <p class="lead text-muted">Find the right products for your crops</p>
+    <h1 class="display-4 mb-3">{{ t('marketplace.title') }}</h1>
+    <p class="lead text-muted">{{ t('marketplace.subtitle') }}</p>
     <div class="mt-4">
       <a href="/" class="btn btn-success btn-lg">
-        <i class="fas fa-camera me-2"></i>Detect Plant Disease First
+        <i class="fas fa-camera me-2"></i>{{ t('marketplace.detect_first') }}
       </a>
     </div>
   </div>
@@ -31,7 +32,7 @@
           type="text"
           id="searchInput"
           class="form-control"
-          placeholder="Search products..."
+          placeholder="{{ t('marketplace.search') }}"
         />
       </div>
     </div>
@@ -59,7 +60,8 @@
             target="_blank"
             class="btn btn-outline-success w-100"
           >
-            <i class="fas fa-shopping-cart me-2"></i>Buy Now
+            <i class="fas fa-shopping-cart me-2"></i>{{
+            t('marketplace.product.buy') }}
           </a>
         </div>
       </div>

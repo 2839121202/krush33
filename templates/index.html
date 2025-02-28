@@ -5,14 +5,14 @@
     <div class="col-md-10">
       <div class="card shadow">
         <div class="card-body">
-          <h2 class="text-center mb-4">Plant Disease Detection</h2>
+          <h2 class="text-center mb-4">{{ t('home.title') }}</h2>
 
           <!-- Upload Form -->
           <form method="POST" enctype="multipart/form-data" id="upload-form">
             <div class="upload-area mb-4" id="drop-area">
               <!-- Language Selection -->
               <div class="mb-3">
-                <label for="language" class="form-label">Select Language</label>
+                <label for="language" class="form-label">{{ t('home.language_select') }}</label>
                 <select class="form-select" name="language" id="language">
                   {% for code, lang in languages.items() %}
                   <option value="{{ code }}" {% if selected_lang == code %}selected{% endif %}>
@@ -24,7 +24,7 @@
               <!-- Image Upload -->
               <div class="text-center p-4">
                 <i class="fas fa-cloud-upload-alt fa-3x mb-3 text-success"></i>
-                <h5>Drag and drop an image or use options below</h5>
+                <h5>{{ t('home.upload.drag_text') }}</h5>
                 <input
                   type="file"
                   name="image"
@@ -38,16 +38,17 @@
                     class="btn btn-outline-success me-2"
                     id="select-button"
                   >
-                    <i class="fas fa-image"></i> Select Image
+                    <i class="fas fa-image"></i> {{ t('home.upload.select_btn') }}
                   </button>
                   <button
                     type="button"
                     class="btn btn-outline-success"
                     id="camera-button"
                   >
-                    <i class="fas fa-camera"></i> Use Camera
+                    <i class="fas fa-camera"></i> {{ t('home.upload.camera_btn') }}
                   </button>
                 </div>
+                <small class="text-muted d-block mt-2">{{ t('home.upload.supported_formats') }}</small>
               </div>
 
               <!-- Camera Container -->
@@ -66,7 +67,7 @@
                   class="btn btn-success mt-2"
                   id="capture-button"
                 >
-                  <i class="fas fa-camera"></i> Capture Photo
+                  <i class="fas fa-camera"></i> {{ t('home.upload.capture_btn') }}
                 </button>
               </div>
 
@@ -83,7 +84,7 @@
                 />
                 <div class="mt-2">
                   <button type="submit" class="btn btn-success">
-                    <i class="fas fa-search"></i> Detect Disease
+                    <i class="fas fa-search"></i> {{ t('home.det_dis') }}
                   </button>
                 </div>
               </div>
@@ -93,12 +94,12 @@
           <!-- Results Section -->
           {% if disease %}
           <div class="result-section mt-4">
-            <h3 class="text-center mb-4">Detection Results</h3>
+            <h3 class="text-center mb-4">{{ t('home.det_res') }}</h3>
             <div class="row">
               <!-- Uploaded Image -->
               <div class="col-md-6">
                 <div class="card h-100">
-                  <div class="card-header bg-success text-white">Uploaded Image</div>
+                  <div class="card-header bg-success text-white">{{ t('home.up') }}</div>
                   <div class="card-body">
                     <img
                       src="{{ url_for('static', filename=image_path) }}"
@@ -110,7 +111,7 @@
               <!-- Reference Image -->
               <div class="col-md-6">
                 <div class="card h-100">
-                  <div class="card-header bg-success text-white">Reference Image</div>
+                  <div class="card-header bg-success text-white">{{ t('home.ref') }}</div>
                   <div class="card-body">
                     <img
                       src="{{ reference_image }}"
@@ -125,12 +126,12 @@
             <div class="mt-4">
               <div class="card">
                 <div class="card-header bg-success text-white">
-                  <h4 class="mb-0">{{ disease }}</h4>
+                  <h4 class="mb-0">{{ t('home.results.disease') }}</h4>
                 </div>
                 <div class="card-body">
-                  <h5>Description</h5>
+                  <h5>{{ t('home.results.description') }}</h5>
                   <p>{{ description }}</p>
-                  <h5>Prevention Steps</h5>
+                  <h5>{{ t('home.results.prevention') }}</h5>
                   <p>{{ prevention }}</p>
                 </div>
               </div>
@@ -215,7 +216,7 @@
             <div class="mt-4">
               <div class="card border-0 shadow-sm">
                 <div class="card-header bg-success text-white">
-                    <h4 class="mb-0">Recommended Product</h4>
+                    <h4 class="mb-0">{{ t('home.results.recommended') }}</h4>
                 </div>
                 <div class="card-body p-4">
                     <div class="product-card">
@@ -233,7 +234,7 @@
                                 <a href="{{ recommended_product.buy_link }}"
                                    target="_blank"
                                    class="btn btn-outline-success w-100">
-                                    <i class="fas fa-shopping-cart me-2"></i>Buy Now
+                                    <i class="fas fa-shopping-cart me-2"></i>{{ t('home.results.buy') }}
                                 </a>
                             </div>
                         </div>
@@ -241,7 +242,7 @@
 
                     <div class="text-center mt-4">
                         <a href="/marketplace" class="btn btn-success btn-lg">
-                            <i class="fas fa-store me-2"></i>View All Products
+                            <i class="fas fa-store me-2"></i>{{ t('home.results.view_all') }}
                         </a>
                     </div>
                 </div>

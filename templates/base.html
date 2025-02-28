@@ -64,40 +64,45 @@
         <a class="navbar-brand" href="/">
           <i class="fas fa-leaf me-2"></i>Krush33
         </a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-        >
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav">
             <li class="nav-item">
-              <a class="nav-link" href="/"
-                ><i class="fas fa-home me-1"></i>Home</a
-              >
+              <a class="nav-link" href="/"><i class="fas fa-home me-1"></i>{{ t('nav.home') }}</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/weather"
-                ><i class="fas fa-cloud me-1"></i>Weather</a
-              >
+              <a class="nav-link" href="/weather"><i class="fas fa-cloud me-1"></i>{{ t('nav.weather') }}</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/marketplace"
-                ><i class="fas fa-store me-1"></i>Marketplace</a
-              >
+              <a class="nav-link" href="/marketplace"><i class="fas fa-store me-1"></i>{{ t('nav.marketplace') }}</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#"
-                ><i class="fas fa-info-circle me-1"></i>About</a
-              >
+              <a class="nav-link" href="#"><i class="fas fa-info-circle me-1"></i>{{ t('nav.about') }}</a>
             </li>
           </ul>
+          <!-- Add language selector -->
+          <div class="ms-auto">
+            <select class="form-select" onchange="changeLanguage(this.value)">
+              {% for code, lang in languages.items() %}
+              <option value="{{ code }}" {% if session.lang == code %}selected{% endif %}>
+                {{ lang.name }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
         </div>
       </div>
     </nav>
+
+    <script>
+      function changeLanguage(lang) {
+          const url = new URL(window.location);
+          url.searchParams.set('lang', lang);
+          window.location.href = url.toString();
+      }
+    </script>
 
     <div class="content-wrapper">{% block content %}{% endblock %}</div>
 
