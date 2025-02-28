@@ -1,0 +1,359 @@
+{% extends "base.html" %} {% block title %}Weather Forecast{% endblock %} {%
+block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <div class="card shadow">
+        <div class="card-body">
+          <h2 class="text-center mb-4">Weather Forecast</h2>
+
+          <!-- Location Form -->
+          <div class="row mb-4">
+            <div class="col-md-8">
+              <div class="input-group">
+                <span class="input-group-text"
+                  ><i class="fas fa-search-location"></i
+                ></span>
+                <input
+                  type="text"
+                  id="location-input"
+                  class="form-control"
+                  placeholder="Enter city name (e.g., Chennai, IN)"
+                />
+                <button
+                  class="btn btn-success"
+                  type="button"
+                  id="search-location"
+                >
+                  <i class="fas fa-search"></i> Search
+                </button>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <button id="current-location" class="btn btn-success w-100">
+                <i class="fas fa-map-marker-alt"></i> Use Current Location
+              </button>
+            </div>
+          </div>
+
+          <!-- Forecast Duration Buttons -->
+          <div class="btn-group mb-4" role="group">
+            <button
+              type="button"
+              class="btn btn-outline-success active"
+              data-days="7"
+            >
+              7 Days
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-success"
+              data-days="14"
+            >
+              14 Days
+            </button>
+          </div>
+
+          <!-- Loading Spinner -->
+          <div id="loading" class="text-center my-5" style="display: none">
+            <div class="spinner-border text-success" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+
+          <!-- Weather Cards Container -->
+          <div id="weather-container" class="row g-4">
+            <!-- Weather cards will be inserted here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let map;
+  let currentDays = 7;
+
+  async function getWeather(lat, lon, days = 7) {
+    try {
+      showLoading(true);
+      const response = await fetch(
+        `/api/weather?lat=${lat}&lon=${lon}&days=${days}`
+      );
+      const data = await response.json();
+
+      if (response.ok) {
+        displayWeather(data);
+      } else {
+        showError(data.error || "Failed to fetch weather data");
+      }
+    } catch (error) {
+      showError("Failed to fetch weather data");
+    } finally {
+      showLoading(false);
+    }
+  }
+
+  function displayWeather(data) {
+    const container = document.getElementById("weather-container");
+    container.innerHTML = "";
+
+    data.daily.forEach((day, index) => {
+      const date = new Date(day.date);
+      const formattedDate = date.toLocaleDateString("en-US", {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+      });
+
+      const card = document.createElement("div");
+      card.className = "col-lg-3 col-md-4 col-sm-6 mb-4";
+      card.innerHTML = `
+            <div class="card h-100 weather-card ${
+              index === 0 ? "today" : ""
+            } shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0 ${
+                          index === 0 ? "text-success" : ""
+                        }">${index === 0 ? "Today" : formattedDate}</h5>
+                        <span class="badge ${getWeatherBadgeClass(
+                          day.weathercode
+                        )}">${getWeatherDescription(day.weathercode)}</span>
+                    </div>
+
+                    <div class="weather-icon-container text-center my-3">
+                        <i class="fas fa-${day.icon} fa-3x ${
+        index === 0 ? "text-success" : "text-primary"
+      }"></i>
+                    </div>
+
+                    <div class="temperature-container text-center mb-3">
+                        <span class="h2 text-danger">${Math.round(
+                          day.temp_max
+                        )}°</span>
+                        <span class="h4 text-primary ms-2">${Math.round(
+                          day.temp_min
+                        )}°</span>
+                    </div>
+
+                    <div class="weather-details">
+                        <div class="detail-item mb-2">
+                            <i class="fas fa-cloud-rain text-info"></i>
+                            <span class="ms-2">${Math.round(
+                              day.precipitation_prob
+                            )}% chance of rain</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-wind text-secondary"></i>
+                            <span class="ms-2">${Math.round(
+                              day.windspeed
+                            )} km/h wind</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+      container.appendChild(card);
+    });
+  }
+
+  function getWeatherBadgeClass(code) {
+    const codeMap = {
+      0: "bg-success", // Clear
+      1: "bg-success", // Mainly clear
+      2: "bg-info", // Partly cloudy
+      3: "bg-secondary", // Overcast
+      45: "bg-secondary", // Foggy
+      51: "bg-info", // Light drizzle
+      61: "bg-primary", // Rain
+      71: "bg-light text-dark", // Snow
+      95: "bg-danger", // Thunderstorm
+    };
+
+    // Find the closest weather code
+    const codes = Object.keys(codeMap).map(Number);
+    const closest = codes.reduce((prev, curr) =>
+      Math.abs(curr - code) < Math.abs(prev - code) ? curr : prev
+    );
+
+    return codeMap[closest];
+  }
+
+  function getWeatherDescription(code) {
+    const descriptions = {
+      0: "Clear Sky",
+      1: "Mainly Clear",
+      2: "Partly Cloudy",
+      3: "Overcast",
+      45: "Foggy",
+      51: "Light Drizzle",
+      61: "Rain",
+      71: "Snow",
+      95: "Thunderstorm",
+    };
+
+    const codes = Object.keys(descriptions).map(Number);
+    const closest = codes.reduce((prev, curr) =>
+      Math.abs(curr - code) < Math.abs(prev - code) ? curr : prev
+    );
+
+    return descriptions[closest];
+  }
+
+  function showLoading(show) {
+    document.getElementById("loading").style.display = show ? "block" : "none";
+  }
+
+  function showError(message) {
+    alert(message);
+  }
+
+  // Event Listeners
+  document.getElementById("current-location").addEventListener("click", () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          getWeather(
+            position.coords.latitude,
+            position.coords.longitude,
+            currentDays
+          );
+        },
+        (error) => {
+          showError("Unable to get location: " + error.message);
+        }
+      );
+    } else {
+      showError("Geolocation is not supported by your browser");
+    }
+  });
+
+  // Forecast duration buttons
+  document.querySelectorAll(".btn-group .btn").forEach((button) => {
+    button.addEventListener("click", (e) => {
+      // Update active button
+      document.querySelector(".btn-group .active").classList.remove("active");
+      e.target.classList.add("active");
+
+      // Update days and refresh weather
+      currentDays = parseInt(e.target.dataset.days);
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((position) => {
+          getWeather(
+            position.coords.latitude,
+            position.coords.longitude,
+            currentDays
+          );
+        });
+      }
+    });
+  });
+
+  // Initial weather load
+  window.addEventListener("load", () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          getWeather(
+            position.coords.latitude,
+            position.coords.longitude,
+            currentDays
+          );
+        },
+        () => {
+          // Default to Chennai coordinates if location access is denied
+          getWeather(13.0827, 80.2707, currentDays);
+        }
+      );
+    }
+  });
+
+  document.getElementById("search-location").addEventListener("click", () => {
+    const location = document.getElementById("location-input").value;
+    if (location) {
+      showLoading(true);
+      fetch(
+        `/api/weather?location=${encodeURIComponent(
+          location
+        )}&days=${currentDays}`
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.error) {
+            showError(data.error);
+          } else {
+            displayWeather(data);
+          }
+        })
+        .catch((error) => {
+          showError("Failed to fetch weather data");
+        })
+        .finally(() => {
+          showLoading(false);
+        });
+    }
+  });
+
+  // Add Enter key support for search
+  document
+    .getElementById("location-input")
+    .addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        document.getElementById("search-location").click();
+      }
+    });
+</script>
+
+<!-- Add this CSS to your existing styles -->
+<style>
+  .weather-card {
+    transition: transform 0.2s ease-in-out;
+    border-radius: 15px;
+    overflow: hidden;
+  }
+
+  .weather-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .weather-card.today {
+    border: 2px solid #198754;
+  }
+
+  .weather-icon-container {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .temperature-container {
+    background: linear-gradient(
+      to right,
+      rgba(220, 53, 69, 0.1),
+      rgba(13, 110, 253, 0.1)
+    );
+    padding: 10px;
+    border-radius: 10px;
+  }
+
+  .weather-details {
+    background-color: rgba(0, 0, 0, 0.03);
+    padding: 15px;
+    border-radius: 10px;
+  }
+
+  .detail-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+  }
+
+  .badge {
+    padding: 8px 12px;
+    font-weight: 500;
+  }
+</style>
+{% endblock %}

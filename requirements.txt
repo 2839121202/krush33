@@ -16,3 +16,8 @@ torch==1.8.1+cpu
 torchvision==0.9.1+cpu
 typing-extensions==3.7.4.3
 Werkzeug==1.0.1
+
+requests
+openmeteo-requests
+requests-cache
+retry-requests

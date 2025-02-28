@@ -8,6 +8,9 @@ import torch
 import pandas as pd
 from werkzeug.utils import secure_filename
 
+from weather import geocode_location, get_weather_data, get_weather_icon
+from flask import jsonify
+
 from config import *
 
 # Load the disease information and the model
@@ -89,6 +92,39 @@ def index():
         return render_template("index.html", error="Invalid file type")
 
     return render_template("index.html")
+
+
+@app.route("/weather")
+def weather():
+    return render_template("weather.html")
+
+
+@app.route("/api/weather")
+def get_weather():
+    try:
+        location = request.args.get("location")
+
+        if location:
+            # Get coordinates from location name
+            coords = geocode_location(location)
+            if coords is None:
+                return jsonify({"error": "Location not found"}), 404
+            lat, lon = coords
+        else:
+            # Use provided coordinates (fallback to Berlin)
+            lat = float(request.args.get("lat", 52.52))
+            lon = float(request.args.get("lon", 13.41))
+
+        days = int(request.args.get("days", 7))
+        weather_data = get_weather_data(lat, lon, days)
+
+        # Add weather icons
+        for day in weather_data["daily"]:
+            day["icon"] = get_weather_icon(int(day["weathercode"]))
+
+        return jsonify(weather_data)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
 
 if __name__ == "__main__":
