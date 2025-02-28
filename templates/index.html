@@ -128,11 +128,21 @@
                 <div class="card-header bg-success text-white">
                   <h4 class="mb-0">{{ t('home.results.disease') }}</h4>
                 </div>
+                <div class="mt-2">
+                  <div class="btn-group">
+                    <button onclick="speakDisease('{{ selected_lang }}')" class="btn btn-sm btn-info">
+                        🔊 {{ t('home.tts.listen') }} : {{ languages[selected_lang].name }}
+                    </button>
+                    <button onclick="stopSpeech()" class="btn btn-sm btn-danger">
+                      🔇 {{ t('home.tts.stop') }}
+                    </button>
+                  </div>
+                </div>
                 <div class="card-body">
                   <h5>{{ t('home.results.description') }}</h5>
-                  <p>{{ description }}</p>
+                  <p id='description'>{{ description }}</p>
                   <h5>{{ t('home.results.prevention') }}</h5>
-                  <p>{{ prevention }}</p>
+                  <p id='prevention'>{{ prevention }}</p>
                 </div>
               </div>
             </div>
@@ -332,5 +342,22 @@
     const file = dt.files[0];
     handleImage(file);
   });
+
+  function speakDisease(lang) {
+    const description = document.querySelector('#description').textContent;
+    const prevention = document.querySelector('#prevention').textContent;
+
+    fetch(`/speak_disease/${lang}?description=${encodeURIComponent(description)}&prevention=${encodeURIComponent(prevention)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                alert('Error playing audio');
+            }
+        });
+  }
+
+  function stopSpeech() {
+      fetch('/stop_speech');
+  }
 </script>
 {% endblock %}

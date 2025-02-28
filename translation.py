@@ -19,8 +19,6 @@ def get_translation(key, lang_code=None):
     if not lang_code:
         lang_code = session.get("lang", "en")
 
-    print(f"Using language: {lang_code} for key: {key}")
-
     translations = load_translations(lang_code)
     keys = key.split(".")
     value = translations

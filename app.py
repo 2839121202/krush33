@@ -16,6 +16,7 @@ import torch
 import pandas as pd
 from werkzeug.utils import secure_filename
 
+from disease_tts import DiseaseTTS
 from weather import geocode_location, get_weather_data, get_weather_icon
 from translation import get_translation
 
@@ -73,6 +74,8 @@ products = disease_info.to_dict("records")
 ## ============== Flask App ============== ##
 # Flask app
 app = Flask(__name__)
+
+tts = DiseaseTTS()
 
 app.secret_key = os.urandom(24)
 app.jinja_env.globals.update(t=get_translation)
@@ -214,6 +217,24 @@ def get_weather():
         return jsonify(weather_data)
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+
+
+@app.route("/speak_disease/<lang>")
+def speak_disease(lang):
+    description = request.args.get("description", "")
+    prevention = request.args.get("prevention", "")
+
+    if lang in tts.languages.values():
+        success = tts.speak_disease_info(description, prevention, lang)
+        return jsonify({"success": success})
+    else:
+        return jsonify({"success": False, "error": "Language not supported"})
+
+
+@app.route("/stop_speech")
+def stop_speech():
+    tts.stop_speaking()
+    return jsonify({"success": True})
 
 
 if __name__ == "__main__":
