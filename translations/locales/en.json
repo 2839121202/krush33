@@ -17,6 +17,10 @@
       "switch_camera": "Switch Camera",
       "supported_formats": "Supported formats: JPG, JPEG, PNG"
     },
+    "tts": {
+      "listen": "Listen to this",
+      "stop": "Stop"
+    },
     "det_dis": "Detect Disease",
     "det_res": "Detection Results",
     "up": "Uploaded Image",
