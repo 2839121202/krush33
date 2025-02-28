@@ -13,9 +13,7 @@ from flask import jsonify
 
 from config import *
 
-# Load the disease information and the model
-disease_info = pd.read_csv(DISEASE_INFO_PATH, encoding=CSV_ENCODING)
-
+## ============== Model ============== ##
 # Load the model
 model = CNN.CNN(NUM_CLASSES)
 model.load_state_dict(torch.load(MODEL_WEIGHTS_PATH))
@@ -34,6 +32,32 @@ def prediction(image_path):
     return index
 
 
+## ============== Disease Info ============== ##
+# Multi-language support
+LANGUAGES = {
+    "en": {"name": "English", "file": f"{DISEASE_INFO_PATH_PARTIAL}_en.csv"},
+    "hi": {"name": "हिंदी", "file": f"{DISEASE_INFO_PATH_PARTIAL}_hi.csv"},
+    "pa": {"name": "ਪੰਜਾਬੀ", "file": f"{DISEASE_INFO_PATH_PARTIAL}_pa.csv"},
+    "bn": {"name": "বাংলা", "file": f"{DISEASE_INFO_PATH_PARTIAL}_bn.csv"},
+    "te": {"name": "తెలుగు", "file": f"{DISEASE_INFO_PATH_PARTIAL}_te.csv"},
+    "ta": {"name": "தமிழ்", "file": f"{DISEASE_INFO_PATH_PARTIAL}_ta.csv"},
+    "ml": {"name": "മലയാളം", "file": f"{DISEASE_INFO_PATH_PARTIAL}_ml.csv"},
+    "kn": {"name": "ಕನ್ನಡ", "file": f"{DISEASE_INFO_PATH_PARTIAL}_kn.csv"},
+    "or": {"name": "ଓଡ଼ିଆ", "file": f"{DISEASE_INFO_PATH_PARTIAL}_or.csv"},
+    "mr": {"name": "मराठी", "file": f"{DISEASE_INFO_PATH_PARTIAL}_mr.csv"},
+    "ur": {"name": "اردو", "file": f"{DISEASE_INFO_PATH_PARTIAL}_ur.csv"},
+}
+
+disease_info_dict = {}
+for lang_code, lang_data in LANGUAGES.items():
+    try:
+        disease_info_dict[lang_code] = pd.read_csv(
+            lang_data["file"], encoding=CSV_ENCODING
+        )
+    except Exception as e:
+        print(f"Error loading {lang_code}: {str(e)}")
+
+## ============== Flask App ============== ##
 # Flask app
 app = Flask(__name__)
 
@@ -58,11 +82,15 @@ def uploaded_file(filename):
 def index():
     if request.method == "POST":
         if "image" not in request.files:
-            return render_template("index.html", error="No file uploaded")
+            return render_template(
+                "index.html", error="No file uploaded", languages=LANGUAGES
+            )
 
         file = request.files["image"]
         if file.filename == "":
-            return render_template("index.html", error="No file selected")
+            return render_template(
+                "index.html", error="No file selected", languages=LANGUAGES
+            )
 
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
@@ -71,6 +99,9 @@ def index():
 
             try:
                 index = prediction(filepath)
+                lang = request.form.get("language", "en")
+                disease_info = disease_info_dict.get(lang, disease_info_dict["en"])
+
                 disease = disease_info.loc[index, "disease_name"]
                 description = disease_info.loc[index, "description"]
                 prevention = disease_info.loc[index, "Possible Steps"]
@@ -78,6 +109,8 @@ def index():
 
                 return render_template(
                     "index.html",
+                    languages=LANGUAGES,
+                    selected_lang=lang,
                     image_path=os.path.join("uploads", filename),
                     disease=disease,
                     description=description,
@@ -86,12 +119,16 @@ def index():
                 )
             except Exception as e:
                 return render_template(
-                    "index.html", error=f"Error processing image: {str(e)}"
+                    "index.html",
+                    languages=LANGUAGES,
+                    error=f"Error processing image: {str(e)}",
                 )
 
-        return render_template("index.html", error="Invalid file type")
+        return render_template(
+            "index.html", languages=LANGUAGES, error="Invalid file type"
+        )
 
-    return render_template("index.html")
+    return render_template("index.html", languages=LANGUAGES)
 
 
 @app.route("/weather")

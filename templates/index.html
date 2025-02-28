@@ -10,6 +10,17 @@
           <!-- Upload Form -->
           <form method="POST" enctype="multipart/form-data" id="upload-form">
             <div class="upload-area mb-4" id="drop-area">
+              <!-- Language Selection -->
+              <div class="mb-3">
+                <label for="language" class="form-label">Select Language</label>
+                <select class="form-select" name="language" id="language">
+                  {% for code, lang in languages.items() %}
+                  <option value="{{ code }}" {% if selected_lang == code %}selected{% endif %}>
+                    {{ lang.name }}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
               <!-- Image Upload -->
               <div class="text-center p-4">
                 <i class="fas fa-cloud-upload-alt fa-3x mb-3 text-success"></i>
