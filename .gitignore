@@ -1,4 +1,5 @@
 files/*.pt
+files/*.h5
 .cache.*
 
 # Byte-compiled / optimized / DLL files

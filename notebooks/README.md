@@ -2,7 +2,7 @@
 
 This directory contains Jupyter notebooks that demonstrate the CNN Model
 
-## Architecture
+## Disease Architecture
 
 | Layer (type)  | Output Shape       | Params     |
 | ------------- | ------------------ | ---------- |
@@ -51,3 +51,33 @@ Input size (MB): 0.57
 Forward/backward pass size (MB): 116.44
 Parameters size (MB): 200.52
 Estimated total size (MB): 317.53
+
+## Soil Type Architecture
+
+| Layer (type)   | Output Shape         | Params  |
+| -------------- | -------------------- | ------- |
+| Conv2D-1       | [None, 218, 218, 16] | 448     |
+| MaxPooling2D-1 | [None, 109, 109, 16] | 0       |
+| Conv2D-2       | [None, 107, 107, 32] | 4,640   |
+| MaxPooling2D-2 | [None, 53, 53, 32]   | 0       |
+| Conv2D-3       | [None, 51, 51, 64]   | 18,496  |
+| MaxPooling2D-3 | [None, 25, 25, 64]   | 0       |
+| Conv2D-4       | [None, 23, 23, 64]   | 36,928  |
+| MaxPooling2D-4 | [None, 11, 11, 64]   | 0       |
+| Conv2D-5       | [None, 9, 9, 64]     | 36,928  |
+| MaxPooling2D-5 | [None, 4, 4, 64]     | 0       |
+| Flatten        | [None, 1024]         | 0       |
+| Dense-1        | [None, 128]          | 131,200 |
+| Dense-2        | [None, 5]            | 645     |
+
+================================================================
+Total params: 229,285
+Trainable params: 229,285
+Non-trainable params: 0
+
+---
+
+Input size (MB): 0.58
+Forward/backward pass size (MB): 14.21
+Parameters size (MB): 0.87
+Estimated total size (MB): 15.66
