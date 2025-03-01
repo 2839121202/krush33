@@ -147,6 +147,45 @@
               </div>
             </div>
 
+            <!-- Report Modal -->
+            <div class="mt-4">
+              <button
+                class="btn btn-outline-warning"
+                data-bs-toggle="modal"
+                data-bs-target="#reportModal">
+                <i class="fas fa-flag"></i> {{ t('home.results.report.button') }}
+              </button>
+            </div>
+
+            <div class="modal fade" id="reportModal" tabindex="-1">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">{{ t('home.results.report.title') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                  </div>
+                  <div class="modal-body">
+                    <form id="reportForm">
+                      <input type="hidden" name="predicted_disease" value="{{ disease }}">
+                      <input type="hidden" name="image_path" value="{{ image_path }}">
+
+                      <div class="mb-3">
+                        <label for="actualDisease" class="form-label">{{ t('home.results.report.actual_disease') }}</label>
+                        <input type="text" class="form-control" id="actualDisease" name="actual_disease" required>
+                      </div>
+
+                      <div class="mb-3">
+                        <label for="comments" class="form-label">{{ t('home.results.report.comments') }}</label>
+                        <textarea class="form-control" id="comments" name="comments" rows="3"></textarea>
+                      </div>
+
+                      <button type="submit" class="btn btn-primary">{{ t('home.results.report.submit') }}</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- Recommended Products -->
             <style>
               /* Card Grid Layout */
@@ -359,5 +398,27 @@
   function stopSpeech() {
       fetch('/stop_speech');
   }
+
+  document.getElementById('reportForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+
+  try {
+    const response = await fetch('/report_prediction', {
+      method: 'POST',
+      body: formData
+    });
+
+    const result = await response.json();
+    if (result.success) {
+      alert("{{ t('home.results.report.success') }}");
+      bootstrap.Modal.getInstance(document.getElementById('reportModal')).hide();
+    } else {
+      throw new Error(result.error);
+    }
+  } catch (error) {
+    alert("{{ t('home.results.report.error') }}");
+  }
+});
 </script>
 {% endblock %}

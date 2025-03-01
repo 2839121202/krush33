@@ -15,6 +15,7 @@ import numpy as np
 import torch
 import pandas as pd
 from werkzeug.utils import secure_filename
+import sqlite3
 
 from disease_tts import DiseaseTTS
 from weather import geocode_location, get_weather_data, get_weather_icon
@@ -198,6 +199,34 @@ def index():
         languages=LANGUAGES,
         selected_lang=session.get("lang", "en"),
     )
+
+
+@app.route("/report_prediction", methods=["POST"])
+def report_prediction():
+    try:
+        predicted_disease = request.form.get("predicted_disease")
+        actual_disease = request.form.get("actual_disease")
+        comments = request.form.get("comments")
+        image_path = request.form.get("image_path")
+
+        conn = sqlite3.connect("predictions.db")
+        c = conn.cursor()
+
+        c.execute(
+            """
+            INSERT INTO prediction_reports
+            (predicted_disease, actual_disease, comments, image_path)
+            VALUES (?, ?, ?, ?)
+        """,
+            (predicted_disease, actual_disease, comments, image_path),
+        )
+
+        conn.commit()
+        conn.close()
+
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
 
 
 @app.route("/soil", methods=["GET", "POST"])

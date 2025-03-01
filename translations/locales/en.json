@@ -32,7 +32,16 @@
       "prevention": "Prevention Steps",
       "recommended": "Recommended Products",
       "buy": "Buy Now",
-      "view_all": "View All Products"
+      "view_all": "View All Products",
+      "report": {
+        "button": "Report Prediction",
+        "title": "Report Incorrect Prediction",
+        "actual_disease": "Actual Disease",
+        "comments": "Additional Comments",
+        "submit": "Submit Report",
+        "success": "Thank you for your report!",
+        "error": "Error submitting report"
+      }
     }
   },
   "soil": {
