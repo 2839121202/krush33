@@ -1,0 +1,225 @@
+{% extends "base.html" %} {% block title %}Soil Type Detection{% endblock %} {%
+block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <div class="card shadow">
+        <div class="card-body">
+          <h2 class="text-center mb-4">{{ t('soil.title') }}</h2>
+
+          <!-- Upload Form -->
+          <form method="POST" enctype="multipart/form-data" id="upload-form">
+            <div class="upload-area mb-4" id="drop-area">
+              <!-- Image Upload -->
+              <div class="text-center p-4">
+                <i class="fas fa-cloud-upload-alt fa-3x mb-3 text-success"></i>
+                <h5>{{ t('soil.upload.drag_text') }}</h5>
+                <input
+                  type="file"
+                  name="image"
+                  id="file-input"
+                  class="d-none"
+                  accept="image/*"
+                />
+                <div class="mt-3">
+                  <button
+                    type="button"
+                    class="btn btn-outline-success me-2"
+                    id="select-button"
+                  >
+                    <i class="fas fa-image"></i> {{ t('soil.upload.select_btn')
+                    }}
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-outline-success"
+                    id="camera-button"
+                  >
+                    <i class="fas fa-camera"></i> {{ t('soil.upload.camera_btn')
+                    }}
+                  </button>
+                </div>
+                <small class="text-muted d-block mt-2"
+                  >{{ t('soil.upload.supported_formats') }}</small
+                >
+              </div>
+
+              <!-- Camera Container -->
+              <div
+                id="camera-container"
+                class="text-center mt-3"
+                style="display: none"
+              >
+                <video
+                  id="camera-feed"
+                  style="width: 100%; max-width: 500px"
+                  autoplay
+                ></video>
+                <button
+                  type="button"
+                  class="btn btn-success mt-2"
+                  id="capture-button"
+                >
+                  <i class="fas fa-camera"></i> {{ t('soil.upload.capture_btn')
+                  }}
+                </button>
+              </div>
+
+              <!-- Preview Container -->
+              <div
+                id="preview-container"
+                class="text-center mt-3"
+                style="display: none"
+              >
+                <img
+                  id="preview-image"
+                  class="img-fluid rounded mb-3"
+                  style="max-height: 300px"
+                />
+                <div class="mt-2">
+                  <button type="submit" class="btn btn-success">
+                    <i class="fas fa-search"></i> {{ t('soil.title') }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+
+          <!-- Results Section -->
+          {% if soil_type %}
+          <div class="result-section mt-4">
+            <h3 class="text-center mb-4">{{ t('soil.results.title') }}</h3>
+            <div class="row">
+              <!-- Uploaded Image -->
+              <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                  <div class="card-header bg-success text-white">
+                    {{ t('soil.results.up_image') }}
+                  </div>
+                  <div class="card-body">
+                    <img
+                      src="{{ url_for('static', filename=image_path) }}"
+                      class="img-fluid rounded"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Results -->
+              <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                  <div class="card-header bg-success text-white">
+                    {{ t('soil.results.soil_type') }}
+                  </div>
+                  <div class="card-body">
+                    <h5>{{ soil_type }}</h5>
+                    <p class="text-muted">
+                      {{ t('soil.results.confidence') }}: {{ confidence }}%
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Crop Recommendations -->
+            <div class="card mt-4">
+              <div class="card-header bg-success text-white">
+                <h4 class="mb-0">{{ t('soil.results.recommendations') }}</h4>
+              </div>
+              <div class="card-body">
+                <p>{{ t('soil.results.recommendations_text') }}</p>
+                <div class="row">
+                  {% for crop in recommended_crops %}
+                  <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                      <div class="card-body">
+                        <h5 class="card-title">{{ crop }}</h5>
+                      </div>
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Same JavaScript code as in index.html for file upload and camera handling
+  const fileInput = document.getElementById("file-input");
+  const selectButton = document.getElementById("select-button");
+  const cameraButton = document.getElementById("camera-button");
+  const cameraContainer = document.getElementById("camera-container");
+  const cameraFeed = document.getElementById("camera-feed");
+  const captureButton = document.getElementById("capture-button");
+  const previewContainer = document.getElementById("preview-container");
+  const previewImage = document.getElementById("preview-image");
+
+  selectButton.addEventListener("click", () => fileInput.click());
+  fileInput.addEventListener("change", handleFileSelect);
+
+  cameraButton.addEventListener("click", async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      cameraFeed.srcObject = stream;
+      cameraContainer.style.display = "block";
+    } catch (err) {
+      console.error("Error accessing camera:", err);
+      alert("Unable to access camera");
+    }
+  });
+
+  captureButton.addEventListener("click", () => {
+    const canvas = document.createElement("canvas");
+    canvas.width = cameraFeed.videoWidth;
+    canvas.height = cameraFeed.videoHeight;
+    canvas.getContext("2d").drawImage(cameraFeed, 0, 0);
+
+    canvas.toBlob((blob) => {
+      const file = new File([blob], "camera-capture.jpg", {
+        type: "image/jpeg",
+      });
+      handleImage(file);
+
+      const stream = cameraFeed.srcObject;
+      stream.getTracks().forEach((track) => track.stop());
+      cameraContainer.style.display = "none";
+    }, "image/jpeg");
+  });
+
+  function handleFileSelect(e) {
+    const file = e.target.files[0];
+    if (file) handleImage(file);
+  }
+
+  function handleImage(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      previewImage.src = e.target.result;
+      previewContainer.style.display = "block";
+    };
+    reader.readAsDataURL(file);
+  }
+
+  const dropArea = document.getElementById("drop-area");
+  ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+    dropArea.addEventListener(eventName, preventDefaults);
+  });
+
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  dropArea.addEventListener("drop", (e) => {
+    const dt = e.dataTransfer;
+    const file = dt.files[0];
+    handleImage(file);
+  });
+</script>
+{% endblock %}

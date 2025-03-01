@@ -1,6 +1,7 @@
 {
   "nav": {
     "home": "Home",
+    "soil": "Soil Detection",
     "weather": "Weather",
     "marketplace": "Marketplace",
     "about": "About"
@@ -32,6 +33,26 @@
       "recommended": "Recommended Products",
       "buy": "Buy Now",
       "view_all": "View All Products"
+    }
+  },
+  "soil": {
+    "title": "Soil Type Detection",
+    "upload": {
+      "title": "Upload Soil Image",
+      "drag_text": "Drag & drop soil image here or",
+      "select_btn": "Select Image",
+      "camera_btn": "Use Camera",
+      "capture_btn": "Capture",
+      "switch_camera": "Switch Camera",
+      "supported_formats": "Supported formats: JPG, JPEG, PNG"
+    },
+    "results": {
+      "title": "Detection Results",
+      "soil_type": "Soil Type",
+      "confidence": "Confidence",
+      "recommendations": "Recommended Crops",
+      "recommendations_text": "Based on the detected soil type, here are some suitable crops you can grow:",
+      "up_image": "Uploaded Image"
     }
   },
   "weather": {

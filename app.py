@@ -20,6 +20,9 @@ from disease_tts import DiseaseTTS
 from weather import geocode_location, get_weather_data, get_weather_icon
 from translation import get_translation
 
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing.image import load_img, img_to_array
+
 from config import *
 
 ## ============== Model ============== ##
@@ -27,6 +30,9 @@ from config import *
 model = CNN.CNN(NUM_CLASSES)
 model.load_state_dict(torch.load(MODEL_WEIGHTS_PATH))
 model.eval()
+
+# Load soil model
+soil_model = load_model(SOIL_MODEL_PATH)
 
 
 # Prediction function
@@ -39,6 +45,26 @@ def prediction(image_path):
     output = output.detach().numpy()
     index = np.argmax(output)
     return index
+
+
+def predict_soil(image_path):
+    img = load_img(image_path, target_size=SOIL_IMAGE_SIZE)
+    img_array = img_to_array(img)
+    img_array = img_array / 255.0
+    img_array = np.expand_dims(img_array, axis=0)
+
+    predictions = soil_model.predict(img_array)
+    soil_type_index = np.argmax(predictions[0])
+    confidence = float(predictions[0][soil_type_index] * 100)
+
+    soil_types = [
+        "Black Soil",
+        "Cinder Soil",
+        "Laterite Soil",
+        "Peat Soil",
+        "Yellow Soil",
+    ]
+    return soil_types[soil_type_index], confidence
 
 
 ## ============== Disease Info ============== ##
@@ -169,6 +195,66 @@ def index():
 
     return render_template(
         "index.html",
+        languages=LANGUAGES,
+        selected_lang=session.get("lang", "en"),
+    )
+
+
+@app.route("/soil", methods=["GET", "POST"])
+def soil():
+    if request.method == "POST":
+        if "image" not in request.files:
+            return render_template(
+                "soil.html",
+                error="No file uploaded",
+                languages=LANGUAGES,
+                selected_lang=session.get("lang", "en"),
+            )
+
+        file = request.files["image"]
+        if file.filename == "":
+            return render_template(
+                "soil.html",
+                error="No file selected",
+                languages=LANGUAGES,
+                selected_lang=session.get("lang", "en"),
+            )
+
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+            file.save(filepath)
+
+            try:
+                soil_type, confidence = predict_soil(filepath)
+                recommended_crops = SOIL_CROP_RECOMMENDATIONS[soil_type]
+
+                return render_template(
+                    "soil.html",
+                    languages=LANGUAGES,
+                    selected_lang=session.get("lang", "en"),
+                    image_path=os.path.join("uploads", filename),
+                    soil_type=soil_type,
+                    confidence=f"{confidence:.2f}",
+                    recommended_crops=recommended_crops,
+                )
+            except Exception as e:
+                return render_template(
+                    "soil.html",
+                    languages=LANGUAGES,
+                    selected_lang=session.get("lang", "en"),
+                    error=f"Error processing image: {str(e)}",
+                )
+
+        return render_template(
+            "soil.html",
+            languages=LANGUAGES,
+            selected_lang=session.get("lang", "en"),
+            error="Invalid file type",
+        )
+
+    return render_template(
+        "soil.html",
         languages=LANGUAGES,
         selected_lang=session.get("lang", "en"),
     )
